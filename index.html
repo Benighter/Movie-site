@@ -3,426 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Movie Website</title>
-
-  <style>
-body {
-  background-color: #141414;
-  color: #ffffff;
-  font-family: 'Roboto', sans-serif;
-  margin: 0;
-  padding: 0;
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #1f1f1f;
-  padding: 20px;
-}
-
-h1 {
-  font-size: 36px;
-  color: #00ffcc;
-  margin: 0;
-}
-
-#search-container {
-  display: flex;
-  align-items: center;
-}
-
-#search-input {
-  padding: 8px;
-  width: 300px;
-  font-size: 18px;
-}
-
-#search-button {
-  padding: 8px 16px;
-  margin-left: 10px;
-  font-size: 18px;
-  background-color: #00ffcc;
-  color: #141414;
-  border: none;
-  cursor: pointer;
-}
-
-#home-button {
-  background-color: #00ffcc;
-  color: #141414;
-  border: none;
-  padding: 8px 16px;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-#autocomplete-container {
-  position: relative;
-  display: inline-block;
-  width: 300px;
-}
-
-#autocomplete-results {
-  position: absolute;
-  background-color: #141414;
-  color: #ffffff;
-  width: 300px;
-  border: 1px solid #00ffcc;
-  border-bottom: none;
-  border-top: none;
-  z-index: 9999;
-  padding: 0;
-  list-style-type: none;
-  margin: 0;
-  display: none;
-}
-
-#autocomplete-results li {
-  padding: 10px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-#autocomplete-results li:hover {
-  background-color: #00ffcc;
-  color: #141414;
-}
-
-#movies-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.movie-card {
-  width: 300px;
-  margin: 20px;
-  padding: 10px;
-  background-color: #1f1f1f;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-  transition: box-shadow 0.3s ease-in-out;
-}
-
-.movie-card:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
-}
-
-.movie-card img {
-  width: 100%;
-  height: auto;
-  border-radius: 10px;
-}
-
-.movie-card h2 {
-  margin-top: 10px;
-  font-size: 20px;
-  color: #ffffff;
-}
-
-.movie-card p {
-  margin-top: 5px;
-  font-size: 16px;
-  color: #cccccc;
-}
-
-.movie-details {
-  margin-top: 20px;
-  text-align: center;
-}
-
-.movie-details img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-
-.movie-details h2 {
-  margin: 10px 0;
-}
-
-.movie-details p {
-  margin-bottom: 5px;
-}
-
-#loading-spinner {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 50px;
-  height: 50px;
-  border: 4px solid #ffffff;
-  border-top: 4px solid #00ffcc;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  z-index: 9999;
-}
-
-#error-container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 20px;
-  background-color: #ff0000;
-  color: #ffffff;
-  font-size: 18px;
-  font-weight: bold;
-  z-index: 9999;
-}
-
-@keyframes spin {
-  0% {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-  100% {
-    transform: translate(-50%, -50%) rotate(360deg);
-  }
-}
-  </style>
-
+  <title>CineMagic - Discover Your Next Favorite Movie</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
-    <h1>Movies</h1>
-    <div id="search-container">
-      <div id="autocomplete-container">
-        <input type="text" id="search-input" placeholder="Search movies">
-        <div id="autocomplete-results"></div>
+    <nav>
+      <div class="logo">
+        <i class="fas fa-film"></i>
+        <h1>CineMagic</h1>
       </div>
-      <button id="search-button">Search</button>
+      <div id="search-container">
+        <div id="autocomplete-container">
+          <input type="text" id="search-input" placeholder="Search movies">
+          <ul id="autocomplete-results"></ul>
+        </div>
+        <button id="search-button"><i class="fas fa-search"></i></button>
+      </div>
+      <button id="home-button"><i class="fas fa-home"></i></button>
+    </nav>
+    <div class="filter-sort">
+      <select id="genre-filter">
+        <option value="">All Genres</option>
+      </select>
+      <select id="sort-select">
+        <option value="popularity.desc">Popularity</option>
+        <option value="vote_average.desc">Rating</option>
+        <option value="release_date.desc">Release Date</option>
+      </select>
     </div>
-    <button id="home-button">Home</button>
   </header>
 
   <main>
     <div id="movies-container"></div>
+    <div id="pagination-container"></div>
   </main>
 
   <div id="loading-spinner"></div>
   <div id="error-container"></div>
 
-  <script>
-const apiKey = '8d595551f86c5ed63a30f17469f09f1a';
-const popularMoviesUrl = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`;
+  <footer>
+    <p>&copy; 2024 CineMagic. All rights reserved.</p>
+  </footer>
 
-const main = document.getElementById('main');
-const searchContainer = document.getElementById('search-container');
-const searchInput = document.getElementById('search-input');
-const searchButton = document.getElementById('search-button');
-const autocompleteResults = document.getElementById('autocomplete-results');
-const moviesContainer = document.getElementById('movies-container');
-const homeButton = document.getElementById('home-button');
-const loadingSpinner = document.getElementById('loading-spinner');
-const errorContainer = document.getElementById('error-container');
-
-// Load popular movies on page load
-window.addEventListener('DOMContentLoaded', () => {
-  fetchMovies(popularMoviesUrl);
-});
-
-// Home button click event
-homeButton.addEventListener('click', () => {
-  fetchMovies(popularMoviesUrl);
-});
-
-// Search button click event
-searchButton.addEventListener('click', () => {
-  const searchTerm = searchInput.value;
-  if (searchTerm) {
-    const searchUrl = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(
-      searchTerm
-    )}`;
-    fetchMovies(searchUrl);
-  }
-});
-
-// Fetch movies
-function fetchMovies(url) {
-  showLoadingSpinner();
-  hideError();
-
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      const movies = data.results;
-      displayMovies(movies);
-    })
-    .catch(error => {
-      displayError('An error occurred while fetching movies.');
-      console.log(error);
-    })
-    .finally(() => {
-      hideLoadingSpinner();
-    });
-}
-
-// Display movies
-function displayMovies(movies) {
-  moviesContainer.innerHTML = '';
-
-  movies.forEach(movie => {
-    const { id, title, poster_path, overview } = movie;
-
-    const movieCard = document.createElement('div');
-    movieCard.classList.add('movie-card');
-
-    const posterUrl = poster_path
-      ? `https://image.tmdb.org/t/p/w500${poster_path}`
-      : 'no-image.jpg';
-
-    const posterImage = document.createElement('img');
-    posterImage.src = posterUrl;
-    posterImage.alt = title;
-    movieCard.appendChild(posterImage);
-
-    const titleElement = document.createElement('h2');
-    titleElement.textContent = title;
-    movieCard.appendChild(titleElement);
-
-    const overviewElement = document.createElement('p');
-    overviewElement.textContent = overview;
-    movieCard.appendChild(overviewElement);
-
-    movieCard.addEventListener('click', () => {
-      displayMovieDetails(id);
-    });
-
-    moviesContainer.appendChild(movieCard);
-  });
-}
-
-// Display movie details
-function displayMovieDetails(movieId) {
-  main.innerHTML = '';
-
-  const movieDetailsUrl = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}`;
-
-  fetch(movieDetailsUrl)
-    .then(response => response.json())
-    .then(movie => {
-      const { title, poster_path, overview } = movie;
-
-      const movieDetailsContainer = document.createElement('div');
-      movieDetailsContainer.classList.add('movie-details');
-
-      const posterUrl = poster_path
-        ? `https://image.tmdb.org/t/p/w500${poster_path}`
-        : 'no-image.jpg';
-
-      const posterImage = document.createElement('img');
-      posterImage.src = posterUrl;
-      posterImage.alt = title;
-      movieDetailsContainer.appendChild(posterImage);
-
-      const titleElement = document.createElement('h2');
-      titleElement.textContent = title;
-      movieDetailsContainer.appendChild(titleElement);
-
-      const overviewElement = document.createElement('p');
-      overviewElement.textContent = overview;
-      movieDetailsContainer.appendChild(overviewElement);
-
-      const trailerButton = document.createElement('button');
-      trailerButton.textContent = 'Watch Trailer';
-      trailerButton.classList.add('trailer-button');
-      trailerButton.addEventListener('click', () => {
-        displayMovieTrailer(movieId);
-      });
-      movieDetailsContainer.appendChild(trailerButton);
-
-      main.appendChild(movieDetailsContainer);
-    })
-    .catch(error => {
-      displayError('An error occurred while fetching movie details.');
-      console.log(error);
-    });
-}
-
-// Display movie trailer
-function displayMovieTrailer(movieId) {
-  const movieTrailerUrl = `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${apiKey}`;
-
-  fetch(movieTrailerUrl)
-    .then(response => response.json())
-    .then(data => {
-      const videos = data.results;
-      const trailer = videos.find(video => video.type === 'Trailer');
-
-      if (trailer) {
-        const youtubeVideoUrl = `https://www.youtube.com/watch?v=${trailer.key}`;
-        window.open(youtubeVideoUrl, '_blank');
-      } else {
-        displayError('No trailer available for this movie.');
-        console.log('No trailer available for this movie.');
-      }
-    })
-    .catch(error => {
-      displayError('An error occurred while fetching movie trailer.');
-      console.log(error);
-    });
-}
-
-// Show loading spinner
-function showLoadingSpinner() {
-  loadingSpinner.style.display = 'block';
-}
-
-// Hide loading spinner
-function hideLoadingSpinner() {
-  loadingSpinner.style.display = 'none';
-}
-
-// Display error message
-function displayError(message) {
-  errorContainer.textContent = message;
-  errorContainer.style.display = 'block';
-}
-
-// Hide error message
-function hideError() {
-  errorContainer.style.display = 'none';
-}
-
-// Autocomplete search
-searchInput.addEventListener('input', () => {
-  const searchTerm = searchInput.value;
-
-  if (searchTerm) {
-    const autocompleteUrl = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(
-      searchTerm
-    )}`;
-
-    fetch(autocompleteUrl)
-      .then(response => response.json())
-      .then(data => {
-        const movies = data.results;
-        const autocompleteResultsHtml = movies
-          .map(movie => `<li>${movie.title}</li>`)
-          .join('');
-        autocompleteResults.innerHTML = autocompleteResultsHtml;
-        autocompleteResults.style.display = 'block';
-
-        const autocompleteItems = autocompleteResults.querySelectorAll('li');
-        autocompleteItems.forEach(item => {
-          item.addEventListener('click', () => {
-            searchInput.value = item.textContent;
-            autocompleteResults.style.display = 'none';
-          });
-        });
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  } else {
-    autocompleteResults.style.display = 'none';
-  }
-});
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
